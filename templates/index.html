@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificador Perros/Gatos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #560bad;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .upload-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--accent);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(72, 149, 239, 0.1);
+            border-color: var(--secondary);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .result-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .model-result {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+        
+        .model-result:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .model-name {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .model-name i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .prediction-text {
+            font-weight: 500;
+            margin: 0.5rem 0;
+        }
+        
+        .confidence-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-container {
+            margin-top: 0.5rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--success), var(--accent));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .animal-icon {
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+        
+        .dog {
+            color: #f8961e;
+        }
+        
+        .cat {
+            color: #f72585;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-container, .result-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clasificador de Perros y Gatos</h1>
+            <p class="subtitle">Sube una imagen y descubre si es un perro o un gato</p>
+        </header>
+        
+        <div class="upload-container">
+            <h2><i class="fas fa-cloud-upload-alt"></i> Sube una imagen</h2>
+            <p>Selecciona una imagen de un perro o gato para clasificarla</p>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <p>Arrastra y suelta tu imagen aquí o haz clic para seleccionar</p>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+            </div>
+            
+            <div class="actions">
+                <button class="btn" onclick="predict()">
+                    <i class="fas fa-paw"></i> Clasificar Imagen
+                </button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analizando imagen...</p>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="result-header">
+                <h2><i class="fas fa-chart-bar"></i> Resultados del Análisis</h2>
+            </div>
+            
+            <img id="preview" class="image-preview" src="" alt="Imagen subida">
+            
+            <div id="results"></div>
+        </div>
+        
+        <footer>
+            <p>Clasificador de imágenes by Rosalba Moncada Lazcano y Marisa Yañez Vargas 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Manejar el área de arrastrar y soltar
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = 'rgba(72, 149, 239, 0.2)';
+            uploadArea.style.borderColor = 'var(--secondary)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '';
+            uploadArea.style.borderColor = 'var(--accent)';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '';
+            uploadArea.style.borderColor = 'var(--accent)';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                // Mostrar vista previa
+                const preview = document.getElementById('preview');
+                preview.src = URL.createObjectURL(fileInput.files[0]);
+                document.getElementById('resultContainer').style.display = 'block';
+            }
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                // Mostrar vista previa
+                const preview = document.getElementById('preview');
+                preview.src = URL.createObjectURL(fileInput.files[0]);
+                document.getElementById('resultContainer').style.display = 'block';
+            }
+        });
+        
+        function predict() {
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Por favor selecciona una imagen primero');
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultContainer').style.display = 'block';
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+                for (const [model, prediction] of Object.entries(data.predictions)) {
+                    const modelDiv = document.createElement('div');
+                    modelDiv.className = 'model-result';
+                    
+                    // Determinar el icono según la clase predicha
+                    const animalIcon = prediction.class.toLowerCase().includes('dog') ? 
+                        '<i class="fas fa-dog animal-icon dog"></i>' : 
+                        '<i class="fas fa-cat animal-icon cat"></i>';
+                    
+                    modelDiv.innerHTML = `
+                        <h3 class="model-name">
+                            <i class="fas fa-robot"></i>
+                            ${model.toUpperCase()} 
+                            ${animalIcon}
+                        </h3>
+                        <p class="prediction-text">Predicción: <strong>${prediction.class}</strong></p>
+                        <p class="confidence-text">Confianza: ${(prediction.confidence * 100).toFixed(2)}%</p>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${prediction.confidence * 100}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultsDiv.appendChild(modelDiv);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                console.error('Error:', error);
+                alert('Ocurrió un error al procesar la imagen');
+            });
+        }
+    </script>
+</body>
+</html>
